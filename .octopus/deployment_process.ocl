@@ -26,14 +26,14 @@ step "deploy-a-package" {
             Octopus.Action.Package.DownloadOnTentacle = "False"
             Octopus.Action.Package.FeedId = "octopus-server-built-in"
             Octopus.Action.Package.JsonConfigurationVariablesTargets = "appsettings.json"
-            Octopus.Action.Package.PackageId = "Trident.Workshop.Web"
+            Octopus.Action.Package.PackageId = "Trident.Web"
         }
         worker_pool_variable = ""
 
         packages {
             acquisition_location = "Server"
             feed = "octopus-server-built-in"
-            package_id = "Trident.Workshop.Web"
+            package_id = "Trident.Web"
             properties = {
                 SelectionMode = "immediate"
             }
