@@ -161,28 +161,13 @@ step "deploy-database-changes" {
 }
 
 step "deploy-a-package" {
-    name = "Deploy Trident Website"
+    name = "Deploy a Package"
     properties = {
-        Octopus.Action.MaxParallelism = "1"
         Octopus.Action.TargetRoles = "trident-web"
     }
 
-    action "remove-from-load-balancer-clone-1" {
-        action_type = "Octopus.Script"
-        environments = ["staging", "production"]
-        name = "Remove from Load Balancer - clone (1)"
-        properties = {
-            Octopus.Action.RunOnServer = "true"
-            Octopus.Action.Script.ScriptBody = "Write-Host \"Remove from the Load Balancer.\""
-            Octopus.Action.Script.ScriptSource = "Inline"
-            Octopus.Action.Script.Syntax = "PowerShell"
-        }
-        worker_pool = "hosted-windows"
-    }
-
-    action "deploy-a-package" {
+    action {
         action_type = "Octopus.TentaclePackage"
-        name = "Deploy a Package"
         properties = {
             Octopus.Action.EnabledFeatures = "Octopus.Features.JsonConfigurationVariables"
             Octopus.Action.Package.DownloadOnTentacle = "False"
@@ -200,23 +185,6 @@ step "deploy-a-package" {
                 SelectionMode = "immediate"
             }
         }
-    }
-
-    action "add-to-load-balancer" {
-        action_type = "Octopus.Script"
-        environments = ["staging", "production"]
-        name = "Add to Load Balancer"
-        properties = {
-            Octopus.Action.RunOnServer = "true"
-            Octopus.Action.Script.ScriptBody = <<-EOT
-                $machineName = $OctopusParameters["Octopus.Machine.Name"]
-                
-                Write-Host "Remove $machineName from the Load Balancer."
-            EOT
-            Octopus.Action.Script.ScriptSource = "Inline"
-            Octopus.Action.Script.Syntax = "PowerShell"
-        }
-        worker_pool = "hosted-windows"
     }
 }
 
