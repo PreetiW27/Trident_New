@@ -11,21 +11,6 @@ step "calculate-deployment-mode" {
     }
 }
 
-step "enable-maintenance-mode" {
-    name = "Enable Maintenance Mode"
-
-    action {
-        action_type = "Octopus.Script"
-        properties = {
-            Octopus.Action.RunOnServer = "true"
-            Octopus.Action.Script.ScriptBody = "Write-Host \"Enable Maintenance Mode\""
-            Octopus.Action.Script.ScriptSource = "Inline"
-            Octopus.Action.Script.Syntax = "PowerShell"
-        }
-        worker_pool = "hosted-windows"
-    }
-}
-
 step "run-the-trident-database-creation-runbook" {
     condition = "Variable"
     name = "Run Trident Database Creation Runbook"
@@ -120,21 +105,18 @@ step "auto-approve-database-delta-script" {
     }
 }
 
-step "approve-database-delta-script" {
-    condition = "Variable"
-    name = "Approve Database Delta Script"
-    properties = {
-        Octopus.Step.ConditionVariableExpression = "#{if Octopus.Deployment.Error == \"\"}#{Project.Database.ApprovalRequired}#{/if}\""
-    }
+step "enable-maintenance-mode" {
+    name = "Enable Maintenance Mode"
 
     action {
-        action_type = "Octopus.Manual"
+        action_type = "Octopus.Script"
         properties = {
-            Octopus.Action.Manual.BlockConcurrentDeployments = "True"
-            Octopus.Action.Manual.Instructions = "Please approve the database delta scripts found in the artifacts section."
-            Octopus.Action.Manual.ResponsibleTeamIds = "dbas,global/octopus-managers"
+            Octopus.Action.RunOnServer = "true"
+            Octopus.Action.Script.ScriptBody = "Write-Host \"Enable Maintenance Mode\""
+            Octopus.Action.Script.ScriptSource = "Inline"
+            Octopus.Action.Script.Syntax = "PowerShell"
         }
-        worker_pool_variable = ""
+        worker_pool = "hosted-windows"
     }
 }
 
@@ -230,6 +212,24 @@ step "disablemaintenance-mode" {
             Octopus.Action.Script.Syntax = "PowerShell"
         }
         worker_pool = "hosted-windows"
+    }
+}
+
+step "approve-database-delta-script" {
+    condition = "Variable"
+    name = "Approve Database Delta Script"
+    properties = {
+        Octopus.Step.ConditionVariableExpression = "#{if Octopus.Deployment.Error == \"\"}#{Project.Database.ApprovalRequired}#{/if}\""
+    }
+
+    action {
+        action_type = "Octopus.Manual"
+        properties = {
+            Octopus.Action.Manual.BlockConcurrentDeployments = "True"
+            Octopus.Action.Manual.Instructions = "Please approve the database delta scripts found in the artifacts section."
+            Octopus.Action.Manual.ResponsibleTeamIds = "dbas,global/octopus-managers"
+        }
+        worker_pool_variable = ""
     }
 }
 
