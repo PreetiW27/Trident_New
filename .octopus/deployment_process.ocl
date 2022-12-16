@@ -102,6 +102,7 @@ step "auto-approve-database-delta-script" {
             Octopus.Action.Template.Id = "ActionTemplates-23"
             Octopus.Action.Template.Version = "2"
         }
+        tenant_tags = ["Branch Type/Pseudo "]
         worker_pool = "hosted-windows"
     }
 }
