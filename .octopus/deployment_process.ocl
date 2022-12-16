@@ -116,7 +116,7 @@ step "approve-database-delta-script" {
 
     action {
         action_type = "Octopus.Manual"
-        environments = ["staging"]
+        environments = ["development", "production", "test"]
         properties = {
             Octopus.Action.Manual.BlockConcurrentDeployments = "True"
             Octopus.Action.Manual.Instructions = "Please approve the database delta scripts found in the artifacts section."
