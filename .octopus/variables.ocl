@@ -1,12 +1,3 @@
-variable "Project.Database.Name" {
-    value "Trident " {}
-
-    value "Trident_#{Octopus.Environment.Name}" {
-        description = ""
-        environment = ["development", "test", "staging"]
-    }
-}
-
 variable "ConnectionStrings:Database" {
     value "#{Project.Connection.String}" {}
 }
@@ -21,4 +12,13 @@ variable "Project.Database.Report.Path" {
 
 variable "Project.Database.ApprovalRequired" {
     value "#{Octopus.Action[Auto-Approve Database Delta Script].Output.ApprovalRequired}\"" {}
+}
+
+variable "Project.Database.Name" {
+    value "Trident_#{Retail.Tenant.ShortName}" {}
+
+    value "Trident_#{Octopus.Environment.Name}_#{Retail.Tenant.ShortName}" {
+        description = ""
+        environment = ["development", "test", "staging"]
+    }
 }
