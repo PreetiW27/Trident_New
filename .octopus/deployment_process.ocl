@@ -193,28 +193,18 @@ step "deploy-a-package" {
     }
 }
 
-step "verify-trident-application" {
-    name = "Verify Trident Application "
-
-    action {
-        action_type = "Octopus.Manual"
-        properties = {
-            Octopus.Action.Manual.BlockConcurrentDeployments = "False"
-            Octopus.Action.Manual.Instructions = "Please verify the Trident Application"
-            Octopus.Action.Manual.ResponsibleTeamIds = "qa,global/octopus-managers"
-        }
-        worker_pool_variable = ""
-    }
-}
-
 step "disable-maintanance-mode" {
-    name = "Disable Maintanance Mode"
+    name = "Update Load Balancer to Blue or Green"
 
     action {
         action_type = "Octopus.Script"
+        channels = ["release", "hotfixes"]
         properties = {
             Octopus.Action.RunOnServer = "true"
-            Octopus.Action.Script.ScriptBody = "Write-Host \"DisableMaintenance Mode\""
+            Octopus.Action.Script.ScriptBody = <<-EOT
+                $currentEnvironment = $OctopusParameters["Octopus.Environment.Name"]
+                Write-Highlight "Updating load balancer to point to $currentEnvironment"
+            EOT
             Octopus.Action.Script.ScriptSource = "Inline"
             Octopus.Action.Script.Syntax = "PowerShell"
         }
@@ -253,6 +243,30 @@ step "send-slack-message-on-failure" {
             ssn_Message = "#{Notification.Body.Text}"
             ssn_Title = "#{Notification.Subject.Text}"
             ssn_Username = "Trident Project in Octopus Deploy"
+        }
+        worker_pool = "hosted-windows"
+    }
+}
+
+step "verify-application" {
+    name = "Verify Application "
+
+    action {
+        action_type = "Octopus.Script"
+        properties = {
+            Octopus.Action.RunOnServer = "true"
+            Octopus.Action.Script.ScriptBody = <<-EOT
+                $randomNumber = Get-Random -Minimum 1 -Maximum 100
+                
+                Write-Host "The random number is $randomNumber.  If it is above 90, this will fail the step."
+                if ($randomNumber -ge 90)
+                {
+                	Write-Host "An error occurred verifying the application."
+                    exit 1
+                }
+            EOT
+            Octopus.Action.Script.ScriptSource = "Inline"
+            Octopus.Action.Script.Syntax = "PowerShell"
         }
         worker_pool = "hosted-windows"
     }
